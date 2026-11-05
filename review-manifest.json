@@ -1,0 +1,32 @@
+{
+  "schema": "spatial-lab/pages-review/v1",
+  "visibility": "public",
+  "reviewed_by": "authorized release and local preflight",
+  "disclosure": "owner-approved-existing-scene2-site",
+  "files": {
+    "assets/app-10081de98551.js": "10081de98551daae11c0823fb0d119667c3355bebe05ff797c42ea79a70830ac",
+    "assets/blue-hour-city-e73fa3a37c92.jpg": "e73fa3a37c92c1a9a6dba05e45548fb024c69e1d4b66cd5afbefc5e7709f9fec",
+    "assets/data-e0cb5f4e2c05.js": "e0cb5f4e2c059ce931f546eec39e863ad17927f992c5b99b21ce7c12df03f47d",
+    "assets/geometry-7bd504838593.js": "7bd504838593ed9027fbc73b694ccf20b32eec07a43889b80b0dc2bf60937060",
+    "assets/mujoco-5d5d89ddd085.mjs": "5d5d89ddd0857a6518c628fa502d42f99d6dd67ca240182f1068cd30a45465ac",
+    "assets/mujoco-e05ac96db7f4.wasm": "e05ac96db7f45bd46e76fed6e3469bf9204329e093344d742a18bca2cc0e230e",
+    "assets/oven-def1f70c18c7.json.gz": "def1f70c18c7997d42c91fb766d665ea6a8135e0fbe28be59bff86a04d940b12",
+    "assets/reading-pinhole-038e5ec46c63.svg": "038e5ec46c63cda828d8a0e72527b6c1bc74ec0a8e7e2be589c0f6d3c76e985f",
+    "assets/reading-right-hand-grip-dfc88abb3050.svg": "dfc88abb3050732d959cb10e302d515fc5199abb9182f47d414b277f4da4e101",
+    "assets/stix-two-math-562551b15b83.ttf": "562551b15b836e6e01d1b7350909baf3c8c8d83260c1190fbf4544333e6936de",
+    "assets/studio-dusk-7d3efe1740c3.jpg": "7d3efe1740c38e6dcd67294c541e1d78f397ad671cab3cf0bdce45fe406ad009",
+    "assets/styles-02ea5254ec49.css": "02ea5254ec49cf99353373921b089fbd604f1247e94a073fd3f51b60b0656242",
+    "assets/three-3e690ac7d180.mjs": "3e690ac7d180b0aadf0891bea39eec643e29e2d3e75c99b18689518665f69ba6",
+    "assets/tianyi-45136910bccf.json.gz": "45136910bccf6e4d8d18f0d10fb5a9c1af48854abb9a45ad09a72967c16ae054",
+    "assets/ur5e-bde145b692e6.json.gz": "bde145b692e60549a06c30487e0cd86d2a48908edd49060893a33670dae8481d",
+    "index.html": "8aba4507f89392f6226d97c976177511faaf9eb4502756266201be147a98200c",
+    "licenses/lucide.txt": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57",
+    "licenses/model-sources.txt": "399c0f74f82d1c5f105780e6b7e746598c36d01c61eb478e4ed7d78af1e0275f",
+    "licenses/mujoco.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "licenses/robotiq-menagerie.txt": "3d5edd18d1e22a17666e9bb84270171ed5ac90b192d24e0177fd171708ea2316",
+    "licenses/stix-two-math.txt": "0c8825913b60d858aacdb33c4ca6660a7d64b0d6464702efbb19313f5765861a",
+    "licenses/three.txt": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
+    "licenses/tianyi-open-hardware.txt": "467fde9cb4e129c0c974f63400e45e8747f3950a4a74fc1a37b5f8220aa9cfe4",
+    "licenses/ur5e-menagerie.txt": "5ec71ccf66c8d03261448f2441a586765b97f2248c860a1ae19689fb1c45cee6"
+  }
+}

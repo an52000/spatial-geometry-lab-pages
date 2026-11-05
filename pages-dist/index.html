@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="离线空间几何实验室：坐标换算、URDF、FK、IK、MuJoCo、线缆功能拓扑与编码器到关节角的交互演示。">
+<title>空间几何实验室 · Scene2 复习台</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='9'%20fill='%23282943'/%3E%3Cpath%20d='m16%205%209%205v11l-9%205-9-5V10l9-5Zm0%2011v10M7%2010l9%206%209-6'%20stroke='%23c2b0ff'%20fill='none'%20stroke-width='1.5'/%3E%3Cpath%20d='M4%2024C12%206%2027%205%2029%208'%20stroke='%239ae4d8'%20fill='none'%20stroke-width='1.5'/%3E%3C/svg%3E">
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="./assets/styles-02ea5254ec49.css">
+</head>
+<body>
+<a class="skip-link" href="#lessonTop">跳到当前实验</a>
+<svg class="lab-topic-art" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <pattern id="lab-cover-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M20 0H0V20" fill="none" stroke="#91acda" stroke-opacity=".12"/>
+    </pattern>
+    <radialGradient id="lab-cover-density"><stop stop-color="#f4c6eb" stop-opacity=".5"/><stop offset="1" stop-color="#b980dd" stop-opacity="0"/></radialGradient>
+    <radialGradient id="lab-cover-splat"><stop stop-color="white" stop-opacity=".88"/><stop offset="1" stop-color="white" stop-opacity=".05"/></radialGradient>
+    <mask id="lab-cover-splat-fade" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#lab-cover-splat)"/></mask>
+  </defs>
+  <symbol id="lab-cover-urdf" viewBox="0 0 320 156">
+    <rect width="320" height="156" fill="url(#lab-cover-grid)"/>
+    <path d="M29 125H292" stroke="#a4b4d1" stroke-opacity=".34"/>
+    <path d="M48 121l31-14 35 9-32 15Z" fill="#546b91" stroke="#8aa4c7"/>
+    <path d="M80 111L120 72 200 45 251 78" fill="none" stroke="#0b172a" stroke-width="21" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M80 111L120 72 200 45 251 78" fill="none" stroke="#879ec3" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M120 70l80-27 51 33" fill="none" stroke="#c3d6ef" stroke-width="2" opacity=".8"/>
+    <path d="M97 73a23 23 0 0 1 34-21m-5-7 6 7-9 3" fill="none" stroke="#e5b0ee" stroke-width="2"/>
+    <g fill="#172743" stroke="#cae1f9" stroke-width="2"><circle cx="80" cy="111" r="7"/><circle cx="120" cy="72" r="8"/><circle cx="200" cy="45" r="7"/><circle cx="251" cy="78" r="6"/></g>
+    <path d="M251 78l25 12m-4-6 4 6-7 1" fill="none" stroke="#f491a9" stroke-width="2"/>
+    <path d="M251 78l-14 18m1-7-1 7 7-2" fill="none" stroke="#a5ddac" stroke-width="2"/>
+    <path d="M251 78V52m-4 6 4-6 4 6" fill="none" stroke="#98c9ff" stroke-width="2"/>
+  </symbol>
+  <symbol id="lab-cover-mesh" viewBox="0 0 320 156">
+    <rect width="320" height="156" fill="url(#lab-cover-grid)"/>
+    <path d="M51 110l113-62 109 29-110 64Z" fill="#0b1725" opacity=".6"/>
+    <path d="M67 63l116-37 73 29-116 39Z" fill="#7fc3c1"/>
+    <path d="M67 63l73 31v32L67 94Z" fill="#305f72"/>
+    <path d="M140 94l116-39v31l-116 40Z" fill="#498b9c"/>
+    <path d="M67 63l116-37 73 29v31l-116 40L67 94Zm0 0 73 31 116-39m-116 39v32m-73-63 189-8m-116 39L67 94" fill="none" stroke="#d1efed" stroke-opacity=".75" stroke-width="1.4"/>
+    <path d="M140 94l116-39-116 71Z" fill="#ecb9e5" fill-opacity=".75" stroke="#ffe5f7" stroke-width="1.5"/>
+    <g fill="#f1f9ff"><circle cx="67" cy="63" r="3"/><circle cx="183" cy="26" r="3"/><circle cx="256" cy="55" r="3"/><circle cx="256" cy="86" r="3"/><circle cx="140" cy="94" r="3"/><circle cx="140" cy="126" r="3"/><circle cx="67" cy="94" r="3"/></g>
+  </symbol>
+  <symbol id="lab-cover-nerf" viewBox="0 0 320 156">
+    <rect width="320" height="156" fill="url(#lab-cover-grid)"/>
+    <ellipse cx="215" cy="76" rx="92" ry="72" fill="url(#lab-cover-density)"/>
+    <path d="M44 83 104 47l180-30M44 83l60 35 180 18" fill="none" stroke="#94a9c6" stroke-dasharray="4 4"/>
+    <path d="M87 50l28-15v65l-28 15Z" fill="#6a96c4" fill-opacity=".24" stroke="#99c6f0"/>
+    <path d="M44 83l243-25" stroke="#c8a6ef" stroke-width="2"/>
+    <g fill="#f2c6ec" stroke="#f9e1ff" stroke-width="1"><circle cx="131" cy="74" r="3"/><circle cx="156" cy="71" r="5"/><circle cx="181" cy="69" r="8"/><circle cx="207" cy="66" r="10"/><circle cx="233" cy="64" r="6"/><circle cx="258" cy="61" r="3"/></g>
+    <path d="M21 70h21v25H21zM42 78l13-7v22l-13-6" fill="#527698" stroke="#b9daf5" stroke-width="1.5"/>
+  </symbol>
+  <symbol id="lab-cover-gs" viewBox="0 0 320 156">
+    <rect width="320" height="156" fill="url(#lab-cover-grid)"/>
+    <g mask="url(#lab-cover-splat-fade)"><ellipse cx="105" cy="89" rx="65" ry="28" fill="#8cdcd1" transform="rotate(-28 105 89)"/></g>
+    <g mask="url(#lab-cover-splat-fade)"><ellipse cx="177" cy="74" rx="68" ry="33" fill="#a59be9" transform="rotate(20 177 74)"/></g>
+    <g mask="url(#lab-cover-splat-fade)"><ellipse cx="231" cy="90" rx="47" ry="22" fill="#eda8cb" transform="rotate(-38 231 90)"/></g>
+    <g fill="none" stroke-width="1.4"><ellipse cx="105" cy="89" rx="50" ry="20" stroke="#a3e7dd" transform="rotate(-28 105 89)"/><ellipse cx="177" cy="74" rx="53" ry="23" stroke="#c8b9f6" transform="rotate(20 177 74)"/><ellipse cx="231" cy="90" rx="35" ry="16" stroke="#f7bed9" transform="rotate(-38 231 90)"/></g>
+    <g stroke="#ecf3ff" stroke-opacity=".72" stroke-dasharray="3 3"><path d="M61 112l88-47m-54 4 20 40m13-53 98 36m-41-40-16 44m34 16 56-44m-38 9 20 26"/></g>
+    <g fill="#fff2fd"><circle cx="105" cy="89" r="2.8"/><circle cx="177" cy="74" r="2.8"/><circle cx="231" cy="90" r="2.8"/></g>
+  </symbol>
+</svg>
+<header><svg class="header-blueprint" viewBox="0 0 288 72" fill="none" aria-hidden="true" focusable="false"><g stroke="currentColor" stroke-width="1"><path d="M4 58H284M32 10v52m34-52v52m34-52v52m34-52v52m34-52v52m34-52v52m34-52v52M26 53l38-32 46 20 37-22 45 11 35 22 40-31"/><path d="m75 33 30-19 29 13v22l-29 13-30-14Zm0 0 30 14 29-20m-29 20v15m112-35h35m-17-17v34m-9-26h18v18h-18z"/><circle cx="64" cy="21" r="4"/><circle cx="147" cy="19" r="5"/><circle cx="192" cy="30" r="4"/></g><path d="M147 19h23m-23 0V5m0 14-12 9m100-1 28-12" stroke="#a7e2d7" stroke-width="1.4"/></svg><div class="brand"><div class="mark" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><rect x="2" y="2" width="44" height="44" rx="13" fill="#282943" stroke="#6f6597"/><path d="m24 10 11 6.5v13L24 36l-11-6.5v-13L24 10Z M13 16.5 24 23l11-6.5 M24 23v13" stroke="#bba5fa" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 33c7-13 21-22 32-20 M11 37c8 1 20-5 28-16" stroke="#98e4d7" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="27" r="2.5" fill="#a7eee0"/><circle cx="37" cy="14" r="2" fill="#d5c1ff"/><path d="M37 34v6m-3-3h6" stroke="#dfd1ff" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="eyebrow">Scene2 具身智能研究学习</div><h1>空间几何实验室</h1></div></div><div class="head-right"><span class="offline">离线工作台</span><button type="button" id="openLearningMap">学习地图</button><button type="button" id="openKnowledgeAtlas">概念与函数索引</button><button id="conventionsButton">坐标约定 / 使用说明</button></div></header>
+
+<div class="layout">
+<aside id="catalogue" aria-label="顶部学习导航">
+<button type="button" id="toggleCatalogue" aria-expanded="false" aria-controls="cataloguePanel">课程目录</button>
+<span id="courseLocation" class="course-location"></span>
+<div id="cataloguePanel" class="catalogue-panel">
+<nav id="courseNav" aria-label="由浅入深的学习顺序"></nav><p id="courseNavEmpty" class="nav-empty" hidden>没有匹配的课程。可以清除筛选或使用全站搜索。</p>
+<details id="courseReferences"><summary>公式、函数与坐标约定</summary><div id="courseReferenceActions"></div></details>
+<details id="catalogueLegacy"><summary>原实验编号与目录筛选</summary>
+<div class="catalogue-views" role="group" aria-label="旧编号工具"><button type="button" data-catalogue-view="course" aria-pressed="true">课程顺序</button><button type="button" data-catalogue-view="library" aria-pressed="false">原实验编号</button></div>
+<label class="course-search" for="courseSearch">筛选目录<input id="courseSearch" type="search" autocomplete="off" placeholder="名称、概念或原编号"></label>
+<button type="button" id="robotBasicsStart" class="robot-basics-start">机器人基础 · 前10项</button>
+<label class="lesson-search" for="lessonSearch">查找实验<input id="lessonSearch" type="search" placeholder="搜索名称、编号或函数" autocomplete="off"></label>
+<label class="catalogue-filter" for="lessonGroup">主题<select id="lessonGroup"></select></label>
+<div class="nav-meta"><p id="navCount" class="nav-count" aria-live="polite"></p><button type="button" id="clearLessonFilter" hidden>清除筛选</button></div>
+<nav aria-label="实验导航" id="nav"></nav><p id="navEmpty" class="nav-empty" hidden>没有匹配的实验。试试更短的关键词，或清除主题筛选；当前实验仍可使用。</p>
+</details>
+</div></aside>
+<main>
+<section id="learningMap" class="learning-map" aria-label="从基础到项目的学习地图" hidden></section>
+<div id="legacyCourse">
+<section class="intro" id="lessonTop" tabindex="-1"><div><div class="lesson-index" id="lessonIndex"></div><h2 id="title" tabindex="-1"></h2><p id="subtitle"></p></div><div class="lesson-step" id="lessonStep"></div></section>
+<section id="courseContext" class="course-context" aria-label="当前内容在学习路线中的位置" hidden></section>
+<div id="lessonOutline" class="lesson-outline" role="navigation" aria-label="本页直达"><span>本页直达</span><div id="lessonOutlineLinks" class="outline-links"></div></div>
+<div id="lab">
+<section id="courseReader" class="course-reader" aria-label="本节基础讲解" hidden></section>
+<section id="learningAtlas" class="hand-panel hidden" aria-label="具身智能学习总纲"></section>
+<section id="conceptPrimer" class="hand-panel hidden" aria-label="实验前先认识概念"></section>
+<details id="robotBasics" class="hand-panel hidden"><summary id="robotBasicsSummary">这页用到的机器人基础</summary><div id="robotBasicsBody"></div></details>
+<details id="rayFormulaReader" class="hand-panel hidden"><summary>公式拆解 · 像素射线与桌面交点</summary><div id="rayFormulaBody"></div></details>
+<details id="mathBridge" class="hand-panel"><summary>这页用到的数学基础</summary><div id="mathBridgeBody"></div></details>
+<details id="researchReading" class="hand-panel hidden"><summary>科研学习任务 · 追代码、补片段、自己运行与核对</summary><div id="readingBody"></div></details>
+
+
+<dialog id="mathLearning" aria-labelledby="mathTitle"><div class="math-dialog-head"><div><h2 id="mathTitle">数学基础</h2><p id="mathEnglish"></p></div><button type="button" id="mathClose">关闭</button></div><nav id="mathNav" aria-label="数学基础主题"></nav><div id="mathTabs" class="research-tabs"></div><div id="mathContent"></div></dialog>
+
+
+
+
+<section id="rigidMathIntro" class="rigid-intro hidden" aria-label="可选数学：四步学习"></section>
+<section id="basicWalkthrough" class="basic-walkthrough hidden" aria-label="基础实验学习模式"></section>
+<section id="rgbdBridge" class="rgbd-bridge hidden"><span>项目常用函数：读数组 → 反投影 → 坐标变换 → 投影核对。</span><button type="button">从小数据开始手敲 →</button></section>
+<section id="handCodePanel" class="hand-panel hidden" aria-label="项目常用函数手敲练习"></section>
+<section id="jointCodeLab" class="hand-panel hidden" aria-label="两关节FK手敲练习"></section>
+<section id="scene2Reading" class="hand-panel hidden" aria-label="Scene2整体代码地图与读码练习"></section>
+<details id="ikResearch" class="hand-panel hidden"><summary>科研小实验 · 残差、求解器停止与项目验收有什么区别？</summary><div id="ikResearchBody"></div><details id="researchImport"></details></details>
+<details id="researchPractice" class="hand-panel hidden"><summary id="practiceSummary">科研练习</summary><div id="practiceBody"></div></details>
+<details id="optimizationLab" class="hand-panel hidden"><summary>优化与科研评价 · 从一次更新到配对实验与分析</summary><div id="optimizationBody"></div></details>
+
+
+
+
+
+
+
+
+
+<section id="rgbdBackground" class="rgbd-panel hidden" aria-label="RGB 深度与背景的同像素对照"></section>
+<section id="urdfTools" class="urdf-tools hidden"><div class="urdf-actions"><label for="urdfFile">本地 URDF <input type="file" id="urdfFile" accept=".urdf,.xml"></label><button id="urdfDefault" class="small">恢复原包 UR5e</button><button id="urdfToFk" class="small">FK · 调关节</button><button id="urdfToIk" class="small">IK · 调目标</button></div><div id="ikActions" class="urdf-actions hidden"><button id="ikStep" class="small">迭代一步</button><button id="ikUseQ" class="small">把当前 q 放入 FK</button><span class="notice">先把“回放迭代”拉到 0，再逐步查看。</span></div><p id="urdfStatus" class="mono"></p><p id="urdfWarnings" class="notice"></p><p id="urdfError" role="alert"></p></section>
+<section id="mjTools" class="urdf-tools hidden" aria-label="MuJoCo 模型加载"><div class="urdf-actions"><label for="mjSample">模型 <select id="mjSample"><option value="ur5e">UR5e＋Robotiq 2F-85 · 真实网格</option><option value="tianyi">天轶 2.0 · 官方模型 / 固定底座</option><option value="oven">原包 Scene2 烤箱 · 原始贴图</option><option value="arm">教学 2R 机械臂＋落球</option><option value="import" disabled>本地 MJCF</option></select></label><button id="mjLoad" class="small">加载示例</button><button id="mjForward" class="small">刷新 FK（不走时间）</button><button id="mjStep" class="small">一步物理</button></div><div class="urdf-actions"><label for="mjFiles">本地 MJCF 与资源 <input id="mjFiles" type="file" multiple accept=".xml,.obj,.stl,.msh,.png,.jpg,.jpeg,.hfield,.bin"></label><label for="mjFolder">或选择资源文件夹 <input id="mjFolder" type="file" webkitdirectory multiple></label><select id="mjEntry" class="hidden" aria-label="MJCF 入口文件"></select><button id="mjLoadEntry" class="small hidden">加载所选入口</button></div><p id="mjStatus" role="status">引擎按需在本地初始化。</p><p class="notice">真实网格与 2D 贴图；播放时由 MuJoCo 积分，不是动画替代物理。天轶采用官方固定底座、21 关节的位置控制模型（无可动手指）；UR5e 已装 2F-85，闭合指令设置后需播放仿真；原包烤箱没有机器人或主动开门控制。本地 XML ≤ 2 MiB，资源 ≤ 64 MiB；保留相对目录，不解析上级目录依赖，文件不上传。</p><p id="mjError" role="alert"></p></section>
+<div class="experiment" id="spaceExperiment">
+<section><div class="viewer" id="viewer"><div id="workflowBoard" class="workflow-board hidden"></div><div id="hardwareBoard" class="hardware-board hidden" aria-label="教学线缆功能拓扑"></div><canvas id="scene" aria-label="可拖动旋转视角的三维几何示意图" title="滚轮翻页；Ctrl＋滚轮缩放。左拖旋转，右拖平移，双击复位。"></canvas><canvas id="mujocoCanvas" class="hidden" aria-label="MuJoCo 物理模型三维视图" title="滚轮翻页；Ctrl＋滚轮缩放。左拖旋转，右拖平移，双击复位。"></canvas><div class="view-top" id="viewCaption">右手系 · 世界 Z 向上</div><div class="view-tools"><button data-view="iso" title="等轴视角">3D</button><button data-view="xy" title="俯视 XY 平面">XY</button><button data-view="xz" title="正视 XZ 平面">XZ</button><button data-view="reset" title="重置观察视角">↺ 视角</button></div><div class="projection" id="projection"><div class="caption">针孔成像 · 320 × 240 px</div><canvas id="imagePlane" width="320" height="240" aria-label="相机投影图像"></canvas><output id="imagePlaneReadout" class="caption" aria-live="off"></output></div><div class="view-bottom">左拖旋转 · 右拖平移 · 滚轮翻页 · Ctrl＋滚轮缩放 · 双击复位</div><div class="legend" id="legend"></div><output id="rigidReadoutPreview" class="viewer-readout-peek" aria-label="数学实验实时结果" aria-live="off" hidden></output><details id="viewerReadout"><summary aria-label="实时数据">实时数据<span id="viewerReadoutPreview" class="viewer-readout-peek" aria-hidden="true"></span></summary><div class="readout"><div class="readout-grid"><div class="matrix-block" id="matrix"></div><div class="stats" id="stats"></div></div><div class="live" id="live" aria-live="polite"></div></div></details></div>
+<section id="basicRotationFocus" class="basic-rotation-focus hidden" aria-label="旋转一步：对象、变化和前后数值"></section>
+<section id="rigidMathPanel" class="rigid-panel hidden" aria-label="数学：对象、变化、不变量与公式"></section>
+<section id="contactLoop" class="readout hidden" aria-label="自动接触点闭环与轨迹记录"></section></section>
+<section class="controls"><div class="control-head"><h3>实验参数</h3><span id="controlUnits" class="mono" style="font-size:10px;color:#798da8">m · deg</span></div><div class="control-actions"><button id="play">▶ 播放变化</button><button id="reset">重置参数</button></div><div id="controls" class="controls-fields"></div><div class="presets" id="presets"></div><p class="notice" id="controlNote"></p></section>
+<section id="walkthroughSide" class="walkthrough-side hidden" aria-label="当前步骤与坐标系说明"></section>
+<details id="transformWhy" class="transform-theory hidden"><summary>公式与代码 · 两段位移如何相加</summary><div id="transformWhyContent"></div></details>
+</div>
+<section id="urdfDetails" class="urdf-details hidden" aria-label="URDF 关节属性与树结构"></section>
+<section id="hardwareChecklist" class="hardware-checklist hidden" aria-label="接线前需要的证据与模型边界">
+<h3>真实接线之前，需要这些证据</h3><p>把线缆编号与两端标签拍清楚，再对照同硬件版本的厂商资料。下列内容当前均未核验；页面没有“已安全连接”的状态。</p>
+<div class="hardware-evidence"><div>硬件型号与修订版<small>未核验 · 不能只看型号名称</small></div><div>线缆编号与两端端口<small>未核验 · 不凭线色判断</small></div><div>电压 / 极性 / 额定电流<small>未核验 · 不试插或带电拔插</small></div><div>协议 / 地址 / 单位<small>未核验 · 外形不等于协议</small></div><div>针脚 / 接地 / 屏蔽<small>未核验 · 需厂家电气资料</small></div><div>急停 / 制动 / 复位要求<small>未核验 · 软件停止不等于安全</small></div></div>
+<div class="hardware-models"><div><h4>URDF 能讲什么？</h4><p>link / joint、局部 origin、axis、限位与惯量。机械树不是线束走向。</p></div><div><h4>MJCF 能讲什么？</h4><p>刚体、碰撞、执行器与传感器的仿真模型。actuator 编号不是实机电机 ID。</p></div><div><h4>真机还缺什么？</h4><p>电气资料、设备映射、标定、反馈与安全验收。模型编译通过不等于可以下发运动。</p></div></div>
+<p><a href="#encoder" data-hardware-go="encoder">下一步：计数如何变成关节角 →</a><a href="#cameraaxes" data-hardware-go="cameraaxes">相机数据如何换坐标 →</a></p>
+</section>
+<section id="notationGuide" class="readout hidden" aria-labelledby="notationHeading"><h3 id="notationHeading">1 · 点公式符号，看坐标系</h3><div id="notationTokens" class="notation-tokens"></div><p id="notationMeaning" aria-live="polite"></p><span id="notationFormula" class="formula"></span><p id="notationContext" class="notice"></p></section>
+<section id="pointDirectionDetails" class="readout hidden" aria-label="点与方向公式对照"></section>
+<section id="learningPractice" class="readout hidden" aria-label="先预测再揭晓"></section>
+<section id="inpaintingLab" class="readout hidden" aria-label="3D 补全的多视角几何练习"></section>
+<section id="rotationFoundations" class="hidden" aria-labelledby="foundationHeading"><h3 id="foundationHeading">公式入门 · 从二维一步一步算</h3><p>下方数值使用上面的角度滑块。先理解每个符号，再看三轴与万向节锁；不必从一整块矩阵开始背。</p><div id="foundationSteps" class="foundation-steps" aria-label="公式学习步骤"></div><div id="foundationContent"></div></section>
+<section class="explain" id="explanation"><div class="tabs"><button id="theoryTab" class="selected">理解公式</button><button id="codeTab">Python 对照</button><button id="sourceTab">项目源码</button><button class="copy" id="copyCode" title="复制当前实验的 Python 示例">复制代码</button></div><div class="text-content" id="theory"></div><div id="codePanel" class="hidden"><pre class="code-content"><code id="code"></code></pre><div class="code-note">学习用最小示例 · 需自行安装 NumPy / SciPy；HTML 本身不依赖 Python。</div></div><div class="text-content hidden" id="sourcePanel"></div></section>
+<div class="bottom-nav"><button id="prev">← 上一实验</button><span>改变参数 → 观察空间 → 对照矩阵 → 回到代码</span><button id="next">下一实验 →</button></div>
+</div>
+<section class="quiz" id="quiz"><div class="quiz-grid" id="quizGrid"></div><div class="quiz-toolbar"><button class="primary" id="checkQuiz">检查答案</button><button id="resetQuiz">重新作答</button><span id="quizScore" aria-live="polite"></span></div></section>
+</div>
+<div id="toolTargetCourse" hidden></div>
+</main></div>
+<button type="button" id="backToLessonTop" class="back-to-top" hidden>回到本页开头 ↑</button>
+
+<dialog id="help"><h2>先统一约定，动画才有意义。</h2><p>这是 GitHub Pages 网页版。学习进度保存在当前浏览器。左侧选择实验，拖动三维画面改变观察角度，滑块只改变实验参数；观察视角不会改变数值结果。</p><ul><li><strong>右手坐标系、列向量、主动旋转：</strong>p′ = R p。默认世界 Z 向上；相机自身坐标另有明确标注。</li><li><strong>T_WB 把 B 系坐标变成 W 系坐标：</strong>p_W = R_WB p_B + t_WB。下标顺序是“目标坐标系在前，来源在后”。</li><li><strong>欧拉角：</strong>本工具使用固定轴外禀 xyz：先绕世界 X，再 Y，再 Z；矩阵 R = Rz(yaw) Ry(pitch) Rx(roll)。对应 SciPy 小写 <code>'xyz'</code>，不是大写 <code>'XYZ'</code>。</li><li><strong>四元数：</strong>基础数学默认 [x, y, z, w]，即标量在后；项目 Graphdeco 源码是 wxyz，已单独标注。可切换显示，但不要把两种顺序混用。q 与 −q 表示同一个旋转。</li><li><strong>单位：</strong>位置为米，姿态角显示为度，URDF 关节角标 rad、移动关节标 m，内部角度为弧度。导入真实机器人代码前核对 mm/m、角度单位、坐标方向与四元数布局。</li><li><strong>示例边界：</strong>门和夹爪只演示刚体几何，不能证明抓取成功、接触保持或运动无碰撞。基础 Python 示例不是控制程序。“项目”模块提取了真实参数、源码和记录，但不执行实机控制或物理仿真；新增 URDF / IK 页做数值运动学教学；MuJoCo 页使用官方 WASM 引擎单独运行教学物理模型。MJCF 四元数为 wxyz；本地原包烤箱保持资产原坐标，不套用 Scene2 的放置/尺度。</li></ul><p>数学状态可在开发者控制台调用 <code>GeometryLab.selfTest()</code> 检查。快捷键：不在输入控件内时，← / → 切换实验；空格播放或暂停。</p><div class="dialog-actions"><button class="primary" id="closeHelp">明白，开始实验</button></div></dialog>
+<div id="contextHelp" popover="auto" role="dialog" aria-labelledby="contextTitle" tabindex="-1" hidden><div class="context-help-top"><h3 id="contextTitle"></h3><button type="button" id="contextClose" aria-label="关闭词语解释">关闭</button></div><p id="contextLocation" class="context-note"></p><p id="contextMeaning"></p><h4>在这一页怎样理解</h4><p id="contextUse"></p><h4>容易混淆的地方</h4><p id="contextNote"></p><h4 id="contextExampleLabel"></h4><pre id="contextExample"></pre><pre id="contextResult" class="hidden"></pre><p id="contextExampleNote" class="context-note"></p><button type="button" id="contextReference">继续查详细说明与例子</button></div>
+<div class="toast" id="toast" role="status"></div>
+<script id="geometry-math" src="./assets/geometry-7bd504838593.js"></script>
+<script src="./assets/data-e0cb5f4e2c05.js"></script>
+<script src="./assets/app-10081de98551.js"></script>
+</body>
+</html>

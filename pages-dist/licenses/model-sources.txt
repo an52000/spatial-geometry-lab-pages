@@ -1,0 +1,3 @@
+Tianyi URDF and geometry: https://github.com/Open-X-Humanoid/TienKung_URDF/tree/4c2c061d72dcdab60d74e45d3efb17246a3b6f62
+UR5e and Robotiq model sources: https://github.com/google-deepmind/mujoco_menagerie
+The website packages browser simulation assets. The source repositories provide original model files.

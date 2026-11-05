@@ -1,0 +1,42 @@
+
+// Pure geometry functions: row-major matrices, active rotations, column vectors.
+const G = (() => {
+  const add=(a,b)=>a.map((x,i)=>x+b[i]), sub=(a,b)=>a.map((x,i)=>x-b[i]);
+  const scale=(a,s)=>a.map(x=>x*s), dot=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0);
+  const norm=a=>Math.hypot(...a), cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+  const unit=a=>{const n=norm(a);if(n<1e-10)throw Error('零向量没有方向');return scale(a,1/n)};
+  const I=()=>[[1,0,0],[0,1,0],[0,0,1]], transpose=A=>A[0].map((_,j)=>A.map(r=>r[j]));
+  const mv=(A,v)=>A.map(r=>dot(r,v)), mm=(A,B)=>A.map(r=>transpose(B).map(c=>dot(r,c)));
+  const rx=a=>[[1,0,0],[0,Math.cos(a),-Math.sin(a)],[0,Math.sin(a),Math.cos(a)]];
+  const ry=a=>[[Math.cos(a),0,Math.sin(a)],[0,1,0],[-Math.sin(a),0,Math.cos(a)]];
+  const rz=a=>[[Math.cos(a),-Math.sin(a),0],[Math.sin(a),Math.cos(a),0],[0,0,1]];
+  const rad=d=>d*Math.PI/180, deg=r=>r*180/Math.PI;
+  const euler=(x,y,z)=>mm(rz(rad(z)),mm(ry(rad(y)),rx(rad(x))));
+  const det=A=>dot(A[0],cross(A[1],A[2]));
+  const rod=(axis,a)=>{const [x,y,z]=unit(axis),c=Math.cos(a),s=Math.sin(a),v=1-c;return [[c+x*x*v,x*y*v-z*s,x*z*v+y*s],[y*x*v+z*s,c+y*y*v,y*z*v-x*s],[z*x*v-y*s,z*y*v+x*s,c+z*z*v]]};
+  const axisQ=(axis,a)=>[...scale(unit(axis),Math.sin(a/2)),Math.cos(a/2)];
+  const qmat=q=>{if(!Array.isArray(q)&&!ArrayBuffer.isView(q))throw Error('四元数须为xyzw四项数组');const values=Array.from(q);if(values.length!==4||!values.every(Number.isFinite))throw Error('四元数须含4个有限分量');const magnitude=norm(values);if(!Number.isFinite(magnitude)||magnitude<1e-10)throw Error('四元数范数过小或非有限');const [x,y,z,w]=scale(values,1/magnitude);return [[1-2*(y*y+z*z),2*(x*y-z*w),2*(x*z+y*w)],[2*(x*y+z*w),1-2*(x*x+z*z),2*(y*z-x*w)],[2*(x*z-y*w),2*(y*z+x*w),1-2*(x*x+y*y)]]};
+  const matq=A=>{let q;const tr=A[0][0]+A[1][1]+A[2][2];if(tr>0){const s=2*Math.sqrt(tr+1);q=[(A[2][1]-A[1][2])/s,(A[0][2]-A[2][0])/s,(A[1][0]-A[0][1])/s,s/4]}else{let i=0;if(A[1][1]>A[i][i])i=1;if(A[2][2]>A[i][i])i=2;const j=(i+1)%3,k=(i+2)%3,s=2*Math.sqrt(1+A[i][i]-A[j][j]-A[k][k]);q=[0,0,0,0];q[i]=s/4;q[j]=(A[j][i]+A[i][j])/s;q[k]=(A[k][i]+A[i][k])/s;q[3]=(A[k][j]-A[j][k])/s}return unit(q)};
+  const slerp=(qa,qb,t)=>{let a=unit(qa),b=unit(qb),d=dot(a,b);if(d<0){b=scale(b,-1);d=-d}d=Math.max(-1,Math.min(1,d));if(d>.9995)return unit(add(scale(a,1-t),scale(b,t)));const th=Math.acos(d);return add(scale(a,Math.sin((1-t)*th)/Math.sin(th)),scale(b,Math.sin(t*th)/Math.sin(th)))};
+  const angle=(A,B)=>{const D=mm(transpose(A),B);return deg(Math.acos(Math.max(-1,Math.min(1,(D[0][0]+D[1][1]+D[2][2]-1)/2))))};
+  const T=(R,t)=>[...R.map((r,i)=>[...r,t[i]]),[0,0,0,1]], point=(H,p)=>mv(H,[...p,1]).slice(0,3);
+  const inverse=H=>{const R=H.slice(0,3).map(r=>r.slice(0,3)),Rt=transpose(R);return T(Rt,scale(mv(Rt,H.slice(0,3).map(r=>r[3])),-1))};
+  const hinge=(p,c,R)=>add(c,mv(R,sub(p,c)));
+  const basis=n=>{n=unit(n);const helper=Math.abs(n[2])<.9?[0,0,1]:[0,1,0],t=unit(cross(helper,n)),b=cross(n,t);return transpose([t,b,n])};
+  const camera=(C,target)=>{const forward=unit(sub(target,C));let up=[0,0,1];if(Math.abs(dot(forward,up))>.999)up=[0,1,0];const right=unit(cross(forward,up)),down=cross(forward,right);return T(transpose([right,down,forward]),C)};
+  const orthoError=R=>{const E=mm(transpose(R),R);return Math.max(...E.flatMap((r,i)=>r.map((x,j)=>Math.abs(x-(i===j?1:0))))) };
+  const selfTest=()=>{let count=0;const near=(a,b,msg)=>{if(Array.isArray(a)){if(a.length!==b.length)throw Error(msg);a.forEach((x,i)=>near(x,b[i],msg));return}if(Math.abs(a-b)>1e-9||!Number.isFinite(a))throw Error(msg+': '+a+' != '+b);};const test=(name,f)=>{f();count++;};
+    test('Rz(90) ex = ey',()=>near(mv(rz(rad(90)),[1,0,0]),[0,1,0],'Rz'));
+    test('extrinsic xyz order',()=>near(mv(euler(90,0,90),[0,1,0]),[0,0,1],'Euler'));
+    test('world vs body order',()=>{near(mv(mm(ry(rad(90)),rz(rad(90))),[1,0,0]),[0,1,0],'world');near(mv(mm(rz(rad(90)),ry(rad(90))),[1,0,0]),[0,0,-1],'body')});
+    test('SE3 inverse and chain',()=>{const A=T(euler(25,-40,70),[1,2,3]),B=T(euler(0,20,30),[.3,-.2,1]),p=[.2,.6,.4];near(point(inverse(A),point(A,p)),p,'inverse');near(point(mm(A,B),p),point(A,point(B,p)),'chain')});
+    test('Rodrigues = Rx',()=>near(rod([1,0,0],.7),rx(.7),'Rodrigues'));
+    test('quat roundtrip and double cover',()=>{for(const a of [0,.3,Math.PI,4.5]){const R=rod([1,2,3],a),q=matq(R);near(qmat(q),R,'roundtrip');near(qmat(scale(q,-1)),R,'double cover')}});
+    test('SLERP short path and sign',()=>{const a=axisQ([0,0,1],rad(170)),b=axisQ([0,0,1],rad(-170));near(qmat(slerp(a,b,.5)),rz(Math.PI),'short path');near(qmat(slerp(a,scale(a,-1),.5)),qmat(a),'same rotation');near(qmat(slerp(a,b,0)),qmat(a),'start');near(qmat(slerp(a,b,1)),qmat(b),'end')});
+    test('hinge radius and TCP offset',()=>{const c=[.2,.3,.4],p=[.5,1,.4],R=rx(.8),q=hinge(p,c,R),d=[0,0,.2];near(norm(sub(q,c)),norm(sub(p,c)),'radius');near(norm(sub(add(q,mv(R,d)),q)),.2,'offset');near(sub(add(q,mv(rx(Math.PI/2),d)),q),[0,-.2,0],'rotated offset')});
+    test('camera coordinates and pinhole',()=>{const H=camera([0,-3,1],[0,0,1]),p=point(inverse(H),[0,0,1]);near(p,[0,0,3],'camera');near(det(H.slice(0,3).map(r=>r.slice(0,3))),1,'camera handedness');near(200*p[0]/p[2]+160,160,'u');const off=point(inverse(H),[.3,0,.7]);near(off,[.3,.3,3],'camera off-axis');near([200*off[0]/off[2]+160,200*off[1]/off[2]+120],[180,140],'pixel down')});
+    test('basis orthogonal and handed',()=>{for(const n of [[0,0,1],[0,1,0],[1,2,3]]){const B=basis(n);near(orthoError(B),0,'basis');near(det(B),1,'det')}});
+    test('zero axis rejected',()=>{let failed=false;try{rod([0,0,0],1)}catch{failed=true}if(!failed)throw Error('zero axis accepted')});
+    return {passed:count,failed:0};};
+  return {add,sub,scale,dot,norm,cross,unit,I,transpose,mv,mm,rx,ry,rz,rad,deg,euler,det,rod,axisQ,qmat,matq,slerp,angle,T,point,inverse,hinge,basis,camera,orthoError,selfTest};
+})();
